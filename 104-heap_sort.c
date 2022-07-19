@@ -1,87 +1,50 @@
 #include "sort.h"
 
 /**
- * heap_sort - implementation of heap sort, applies the sift down method
- * @array: array to be sorted
- * @size: size of the array
- *
- * Return: void
- */
+* stupify - recurrssive heapfiy function
+* @array: Array to sort
+* @heap: size of heap data
+* @i: index
+* @size: size of array
+*/
+
+void stupify(int *array, int heap, int i, int size)
+{
+	int lar = i, left = 2 * i + 1, right = 2 * i + 2, t;
+
+	if (left < heap && array[left] > array[lar])
+		lar = left;
+	if (right < heap && array[right] > array[lar])
+		lar = right;
+	if (lar != i)
+	{
+		t = array[i], array[i] = array[lar], array[lar] = t;
+		print_array(array, size);
+		stupify(array, heap, lar, size);
+	}
+}
+
+/**
+* heap_sort - Sorts array with heap sort algo
+* @array: array to sort
+* @size: Size of array to sort
+*/
+
 void heap_sort(int *array, size_t size)
 {
-	size_t temp_s = size;
+	int i = size / 2 - 1, temp;
 
-	while (temp_s > 1)
+	if (array == NULL || size < 2)
+		return;
+	for (; i >= 0; i--)
+		stupify(array, size, i, size);
+	for (i = size - 1; i >= 0; i--)
 	{
-		heapify(array, temp_s, size);
-		swaper(0, temp_s - 1, array);
-		print_array(array, size);
-		temp_s--;
+		temp = array[0];
+		array[0] = array[i];
+		array[i] = temp;
+		if (i > 0)
+			print_array(array, size);
+		stupify(array, i, 0, size);
 	}
-}
-
-/**
- * heapify - builds a complete max. heap from an array in swap
- * @array: array to be sorted
- * @size: size of the array
- * @original_s: original size of the array, for printing purposes
- *
- * Return: void
- */
-void heapify(int *array, size_t size, size_t original_s)
-{
-	size_t i;
-
-	for (i = (size - 1); (signed int) i >= 0 ; i--)
-	{
-		while (LEFT(i) < size)
-		{
-			if (RIGHT(i) < size)
-			{
-				if (array[RIGHT(i)] > array[i] || array[LEFT(i)] > array[i])
-				{
-					if (array[RIGHT(i)] >= array[LEFT(i)])
-					{
-						swaper(i, RIGHT(i), array);
-						i = RIGHT(i);
-						print_array(array, original_s);
-					}
-					else
-					{
-						swaper(i, LEFT(i), array);
-						i = LEFT(i);
-						print_array(array, original_s);
-					}
-				}
-				else
-					break;
-			}
-			else
-			{
-				if (array[LEFT(i)] > array[i])
-				{
-					swaper(i, LEFT(i), array);
-					print_array(array, original_s);
-				}
-				break;
-			}
-		}
-	}
-}
-
-/**
- * swaper - swap to integers
- * @a: first integer
- * @b: secoond integer
- * @array: array
- *
- * Return: swaped integers
- */
-void swaper(int a, int b, int *array)
-{
-	int temp;
-
-	temp = array[a];
-	array[a] = array[b];
-	array[b] = temp;
 }

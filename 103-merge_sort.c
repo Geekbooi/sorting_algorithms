@@ -1,70 +1,86 @@
 #include "sort.h"
-
+#include <stdlib.h>
+#include <stdio.h>
 
 /**
- * merge_sort - Implementation of merge sort
- * @array: array to be sorted
- * @size: size of the array
- *
- * Return: void
- */
-void merge_sort(int *array, size_t size)
-{
-	int mid;
-	int *temp_array = NULL;
-	size_t i;
+* merge - Merges the splits from merge_sorty
+* @array: Array split to merge
+* @low: lowest index of split
+* @middle: middle index of split
+* @high: high index of split
+* @temp: temp array for merging
+*/
 
-	if (size > 1)
+void merge(int *array, int low, int middle, int high, int *temp)
+{
+	int i, j, k, l = 0, r = 0, n, left[4096], right[4096];
+
+	printf("Merging...\n");
+	i = low, j = middle + 1, k = l = 0;
+	while (i <= middle && j <= high)
 	{
-		mid = size / 2;
-		merge_sort(array, mid);
-		merge_sort(array + mid, size - mid);
-		temp_array = merge(array, array + mid, mid, size - mid);
-		printf("[Done]: ");
-		print_array(temp_array, size);
-		if (temp_array == NULL)
-			return;
-		for (i = 0; i < size; i++)
-			array[i] = temp_array[i];
-		free(temp_array);
+		if (array[i] <= array[j])
+			temp[k] = left[l] = array[i], k++, i++, l++;
+		else
+			temp[k] = right[r] = array[j], k++, j++, r++;
+	}
+	while (i <= middle)
+		temp[k] = left[l] = array[i], k++, i++, l++;
+	while (j <= high)
+		temp[k] = right[r] = array[j], k++, j++, r++;
+	printf("[left]: ");
+	for (n = 0; n < l; n++)
+		(n == 0) ? printf("%d", left[n]) : printf(", %d", left[n]);
+	printf("\n[right]: ");
+	for (n = 0; n < r; n++)
+		(n == 0) ? printf("%d", right[n]) : printf(", %d", right[n]);
+	printf("\n[Done]: ");
+	for (i = low; i <= high; i++)
+	{
+		array[i] = temp[i - low], printf("%d", array[i]);
+		if (i != high)
+			printf(", ");
+		else
+			printf("\n");
 	}
 }
 
 /**
- * merge - merges two sorted arrays
- * @arrayA: first array
- * @arrayB: second array
- * @size_A: size of the first array
- * @size_B: size of the second array
- *
- * Return: the sorted array
- */
-int *merge(int *arrayA, int *arrayB, int size_A, int size_B)
-{
-	int *temp_array = NULL;
-	int i, j, k;
+* merge_sorty - recurrsive function utilizing merge sort algo
+* @array: Array
+* @low: Lowest index of split
+* @high: highest index of split
+* @temp: temp array for mergin
+*/
 
-	temp_array = malloc(sizeof(*temp_array) * (size_A + size_B));
-	if (temp_array == NULL)
-		return (NULL);
-	i = 0;
-	j = 0;
-	k = 0;
-	printf("Merging...\n");
-	printf("[left]: ");
-	print_array(arrayA, size_A);
-	printf("[right]: ");
-	print_array(arrayB, size_B);
-	while (i < size_A && j < size_B)
+void merge_sorty(int *array, int low, int high, int *temp)
+{
+	int middle;
+
+	if (low < high)
 	{
-		if (arrayA[i] < arrayB[j])
-			temp_array[k++] = arrayA[i++];
-		else
-			temp_array[k++] = arrayB[j++];
+		middle = ((high + low - 1) / 2);
+		merge_sorty(array, low, middle, temp);
+		merge_sorty(array, middle + 1, high, temp);
+		merge(array, low, middle, high, temp);
 	}
-	for (; i < size_A; i++)
-		temp_array[k++] = arrayA[i];
-	for (; j < size_B; j++)
-		temp_array[k++] = arrayB[j];
-	return (temp_array);
+}
+
+/**
+* merge_sort - Sorts array with merge sort algo
+* @array: array to sort
+* @size: Size of array to sort
+*/
+
+void merge_sort(int *array, size_t size)
+{
+	int *temp;
+
+	if (array == NULL || size < 2)
+		return;
+	temp = malloc(sizeof(int) * (size + 1));
+	if (temp == NULL)
+		return;
+	merge_sorty(array, 0, size - 1, temp);
+	free(temp);
 }
